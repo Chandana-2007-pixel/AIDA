@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Document Agent</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- PDF and DOCX reading libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- LOGIN PAGE -->
+  <section id="loginPage" class="auth-page">
+    <div class="auth-card">
+      <div class="logo">✦</div>
+      <h1>AI Document Agent</h1>
+      <p class="muted">Your documents. Your answers.</p>
+
+      <div class="auth-tabs">
+        <button id="loginTab" class="active" type="button">Login</button>
+        <button id="signupTab" type="button">Sign up</button>
+      </div>
+
+      <form id="authForm">
+        <label for="authName" id="nameLabel" hidden>Full name</label>
+        <input id="authName" placeholder="Full name" autocomplete="name" hidden>
+
+        <label for="authEmail">Email</label>
+        <input id="authEmail" type="email" placeholder="Email address"
+               autocomplete="email" required>
+
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" placeholder="Password"
+               minlength="6" autocomplete="current-password" required>
+
+        <button id="authSubmit" class="primary full" type="submit">Login</button>
+      </form>
+      <p id="authMessage" class="message" role="status"></p>
+      <p class="small muted">Demo login only. Do not use a real password.</p>
+    </div>
+  </section>
+
+  <!-- MAIN APP -->
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <h2>✦ DocAgent</h2>
+      <p id="welcomeName" class="sidebar-user"></p>
+
+      <button class="nav active" data-page="dashboardPage">▦ Dashboard</button>
+      <button class="nav" data-page="documentsPage">↑ Documents</button>
+      <button class="nav" data-page="chatPage">✉ AI Chat</button>
+      <button class="nav" data-page="historyPage">◷ Chat History</button>
+
+      <button id="logoutBtn" class="nav logout">↪ Logout</button>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <section id="dashboardPage" class="page active">
+        <div class="topbar">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="muted">Your documents and conversations in one place.</p>
+          </div>
+          <button class="primary" data-go="documentsPage">+ Upload files</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <span>Uploaded files</span>
+            <strong id="totalFiles">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Conversations</span>
+            <strong id="totalChats">0</strong>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Recent documents</h2>
+            <button class="text-btn" data-go="documentsPage">View all</button>
+          </div>
+          <div id="recentFiles" class="empty">No files uploaded yet.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Recent chats</h2>
+            <button class="text-btn" data-go="historyPage">View all</button>
+          </div>
+          <div id="recentChats" class="empty">No conversations yet.</div>
+        </div>
+      </section>
+
+      <!-- DOCUMENTS -->
+      <section id="documentsPage" class="page">
+        <div class="topbar">
+          <div>
+            <h1>My Documents</h1>
+            <p class="muted">Upload files to search their contents.</p>
+          </div>
+        </div>
+
+        <div id="dropZone" class="upload-box">
+          <div class="upload-icon">↑</div>
+          <h2>Upload your documents</h2>
+          <p class="muted">PDF, DOCX, TXT, MD, CSV or JSON</p>
+          <label for="fileInput" class="primary upload-label">Choose files</label>
+          <input id="fileInput" type="file" multiple
+                 accept=".pdf,.docx,.txt,.md,.csv,.json">
+          <p id="uploadStatus" class="message" role="status"></p>
+          <p class="small muted">Files are processed in your browser. Keep files small.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Uploaded files</h2>
+            <span id="fileCount" class="muted">0 files</span>
+          </div>
+          <div id="fileList" class="empty">No documents uploaded yet.</div>
+        </div>
+      </section>
+
+      <!-- CHAT -->
+      <section id="chatPage" class="page chat-page">
+        <div class="topbar">
+          <div>
+            <h1>Ask your documents</h1>
+            <p class="muted">Answers are based on the text retrieved from your files.</p>
+          </div>
+          <button id="newChatBtn" class="secondary">+ New chat</button>
+        </div>
+
+        <div class="chat-layout">
+          <aside class="chat-files panel">
+            <h3>Your files</h3>
+            <div id="chatFileList" class="empty">Upload a document first.</div>
+          </aside>
+
+          <div class="chat-workspace">
+            <div id="chatTitle" class="chat-title">New conversation</div>
+            <div id="messages" class="messages">
+              <div class="welcome-message">
+                <div class="logo">✦</div>
+                <h2>What would you like to know?</h2>
+                <p>Upload a document, then ask a question about its contents.</p>
+              </div>
+            </div>
+
+            <form id="questionForm" class="question-form">
+              <textarea id="questionInput" rows="2"
+                        placeholder="Ask a question about your documents..."
+                        required></textarea>
+              <button class="primary send-btn" type="submit">Send ↑</button>
+            </form>
+            <p class="small muted">This demo searches document text; it does not use a real AI model.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAT HISTORY -->
+      <section id="historyPage" class="page">
+        <div class="topbar">
+          <div>
+            <h1>Chat History</h1>
+            <p class="muted">Reopen your previous conversations.</p>
+          </div>
+          <button id="historyNewChatBtn" class="primary">+ New chat</button>
+        </div>
+        <div class="panel">
+          <div id="historyList" class="empty">No saved conversations yet.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
